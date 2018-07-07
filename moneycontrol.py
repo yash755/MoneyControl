@@ -28,8 +28,6 @@ def get_list():
 				open_price = html.find('div',{'id':'n_open'})
 				if open_price:
 					open_p = open_price.text.strip()
-
-				print(nse_price)
 				try:
 					connection = pymysql.connect(host= "localhost",
 			                  user="root",
@@ -38,13 +36,15 @@ def get_list():
 			                  charset='utf8mb4',
 		                      cursorclass=pymysql.cursors.DictCursor)
 					try:
-						print ("dddd")
 						with connection.cursor() as cursor:
-							print ("Inserted")
+							sql = 'SELECT * FROM stock_rates WHERE isin_code=%s'
+							cursor.execute(sql, (code,))
+							result = cursor.fetchone()
+							print (result)
 							cursor.execute("INSERT INTO stock_rates (company_name,isin_code,nse_value,previous_close,open_price) VALUES (%s,%s,%s,%s,%s)", (company_name,code,nse_price,previous_price,open_p))
 							connection.commit()
 					except:
-						print ('ewe')
+						print ('failed')
 					finally:
 						connection.close()
 				except pymysql.Error as e:
