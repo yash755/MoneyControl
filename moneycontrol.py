@@ -40,11 +40,16 @@ def get_list():
 							sql = 'SELECT * FROM stock_rates WHERE isin_code=%s'
 							cursor.execute(sql, (code,))
 							result = cursor.fetchone()
-							print (result)
-							cursor.execute("INSERT INTO stock_rates (company_name,isin_code,nse_value,previous_close,open_price) VALUES (%s,%s,%s,%s,%s)", (company_name,code,nse_price,previous_price,open_p))
-							connection.commit()
+							if result:
+								cursor.execute ("UPDATE stock_rates SET nse_value=%s, previous_close=%s, open_price=%s WHERE isin_code=%s", (nse_price,previous_price,open_p,code))
+								connection.commit()
+								print ("Updated")
+							else:
+								cursor.execute("INSERT INTO stock_rates (company_name,isin_code,nse_value,previous_close,open_price) VALUES (%s,%s,%s,%s,%s)", (company_name,code,nse_price,previous_price,open_p))
+								connection.commit()
+								print ("Inserted")
 					except:
-						print ('failed')
+						print ('Failed Query')
 					finally:
 						connection.close()
 				except pymysql.Error as e:
